@@ -5,7 +5,7 @@ BASE_URL = "https://api-test.qiwi.com/partner"
 AGENT_ID = "fake_agent_id"
 POINT_ID = "fake_point_id"
 BEARER_TOKEN = "fake_bearer_token"
-PAYOUT_ID = "generated_payout_id"
+PAYMENT_ID = "generated_payout_id"
 
 date_regex = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$")
 numeric_regex = re.compile(r"^\d+(\.\d{1,2})?$")
@@ -78,7 +78,7 @@ def test_request_balance():
 
 
 def test_create_payment():
-    url = f"{BASE_URL}/v1/agents/{AGENT_ID}/points/{POINT_ID}/payments/{PAYOUT_ID}"
+    url = f"{BASE_URL}/v1/agents/{AGENT_ID}/points/{POINT_ID}/payments/{PAYMENT_ID}"
     payload = {
         "recipientDetails": {
             "providerCode": "qiwi-wallet",
@@ -107,7 +107,7 @@ def test_create_payment():
         ]:
             assert field in data
 
-        assert data["paymentId"] == PAYOUT_ID
+        assert data["paymentId"] == PAYMENT_ID
         assert date_regex.match(data["creationDateTime"])
         assert date_regex.match(data["expirationDatetime"])
 
@@ -136,7 +136,7 @@ def test_create_payment():
 
 
 def test_execute_payment():
-    url = f"{BASE_URL}/v1/agents/{AGENT_ID}/points/{POINT_ID}/payments/{PAYOUT_ID}/execute"
+    url = f"{BASE_URL}/v1/agents/{AGENT_ID}/points/{POINT_ID}/payments/{PAYMENT_ID}/execute"
     with sync_playwright() as p:
         request = p.request.new_context(
             extra_http_headers={
@@ -157,7 +157,7 @@ def test_execute_payment():
         ]:
             assert field in data
 
-        assert data["paymentId"] == PAYOUT_ID
+        assert data["paymentId"] == PAYMENT_ID
         assert date_regex.match(data["creationDateTime"])
         assert date_regex.match(data["expirationDatetime"])
 

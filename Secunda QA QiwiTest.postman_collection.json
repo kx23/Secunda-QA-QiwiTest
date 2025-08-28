@@ -231,8 +231,8 @@
 					"script": {
 						"exec": [
 							"// Generate paymentId for payment request\r",
-							"const payoutId = pm.globals.replaceIn('{{$randomUUID}}');\r",
-							"pm.collectionVariables.set('payout_id', payoutId);"
+							"const payment_id = pm.globals.replaceIn('{{$randomUUID}}');\r",
+							"pm.collectionVariables.set('payment_id', payment_id);"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -355,7 +355,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/v1/agents/{{agent_id}}/points/{{point_id}}/payments/{{payout_id}}",
+					"raw": "{{base_url}}/v1/agents/{{agent_id}}/points/{{point_id}}/payments/{{payment_id}}",
 					"host": [
 						"{{base_url}}"
 					],
@@ -366,7 +366,7 @@
 						"points",
 						"{{point_id}}",
 						"payments",
-						"{{payout_id}}"
+						"{{payment_id}}"
 					]
 				}
 			},
@@ -484,7 +484,7 @@
 					}
 				],
 				"url": {
-					"raw": "{{base_url}}/v1/agents/{{agent_id}}/points/{{point_id}}/payments/{{payout_id}}/execute",
+					"raw": "{{base_url}}/v1/agents/{{agent_id}}/points/{{point_id}}/payments/{{payment_id}}/execute",
 					"host": [
 						"{{base_url}}"
 					],
@@ -495,7 +495,7 @@
 						"points",
 						"{{point_id}}",
 						"payments",
-						"{{payout_id}}",
+						"{{payment_id}}",
 						"execute"
 					]
 				}
@@ -569,9 +569,8 @@
 			}
 		},
 		{
-			"key": "payout_id",
+			"key": "payment_id",
 			"value": "",
-			"type": "string",
 			"description": {
 				"content": "",
 				"type": "text/plain"
