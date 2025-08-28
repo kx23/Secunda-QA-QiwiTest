@@ -1,0 +1,590 @@
+{
+	"info": {
+		"_postman_id": "86331020-a060-45b0-873a-43d6261b268b",
+		"name": "Secunda QA QiwiTest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21438317"
+	},
+	"item": [
+		{
+			"name": "Get all payments",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Content-Type is application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"let responseJson;\r",
+							"try {\r",
+							"    responseJson = pm.response.json();\r",
+							"} catch (e) {\r",
+							"    pm.test(\"Failed to parse response as JSON\", function () {\r",
+							"        pm.expect.fail(\"Response is not valid JSON\");\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Response is an array\", function () {\r",
+							"    pm.expect(responseJson).to.be.an('array');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Each PaymentInfo has required fields\", function () {\r",
+							"    responseJson.forEach((payment, index) => {\r",
+							"        pm.expect(payment, `Payment at index ${index}`).to.have.property('paymentId');\r",
+							"        pm.expect(payment, `Payment at index ${index}`).to.have.property('creationDateTime');\r",
+							"        pm.expect(payment, `Payment at index ${index}`).to.have.property('expirationDatetime');\r",
+							"        pm.expect(payment, `Payment at index ${index}`).to.have.property('status');\r",
+							"        pm.expect(payment, `Payment at index ${index}`).to.have.property('recipientDetails');\r",
+							"        pm.expect(payment, `Payment at index ${index}`).to.have.property('amount');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Required fields have correct types in each payment\", function () {\r",
+							"    responseJson.forEach((payment, index) => {\r",
+							"        pm.expect(payment.paymentId, `PaymentId at index ${index}`).to.be.a('string');\r",
+							"        pm.expect(payment.paymentId, `PaymentId at index ${index}`).to.have.length.greaterThan(0);\r",
+							"        \r",
+							"        pm.expect(payment.creationDateTime, `CreationDateTime at index ${index}`).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$/);\r",
+							"        pm.expect(payment.expirationDatetime, `ExpirationDatetime at index ${index}`).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$/);\r",
+							"        \r",
+							"        pm.expect(payment.status, `Status at index ${index}`).to.be.an('object');\r",
+							"        pm.expect(payment.recipientDetails, `RecipientDetails at index ${index}`).to.be.an('object');\r",
+							"        pm.expect(payment.amount, `Amount at index ${index}`).to.be.an('object');\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/v1/agents/{{agent_id}}/points/{{point_id}}/payments",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"agents",
+						"{{agent_id}}",
+						"points",
+						"{{point_id}}",
+						"payments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request balance with positive account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Content-Type is application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"let responseJson;\r",
+							"try {\r",
+							"    responseJson = pm.response.json();\r",
+							"} catch (e) {\r",
+							"    pm.test(\"Failed to parse response as JSON\", function () {\r",
+							"        pm.expect.fail(\"Response is not valid JSON\");\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"\r",
+							"pm.test(\"BalanceInfo has required fields\", function () {\r",
+							"    pm.expect(responseJson).to.have.property('balance');\r",
+							"    pm.expect(responseJson).to.have.property('overdraft');\r",
+							"    pm.expect(responseJson).to.have.property('available');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Balance object has correct structure\", function () {\r",
+							"    pm.expect(responseJson.balance).to.be.an('object');\r",
+							"    pm.expect(responseJson.balance).to.have.property('value');\r",
+							"    pm.expect(responseJson.balance).to.have.property('currency');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Overdraft object has correct structure\", function () {\r",
+							"    pm.expect(responseJson.overdraft).to.be.an('object');\r",
+							"    pm.expect(responseJson.overdraft).to.have.property('value');\r",
+							"    pm.expect(responseJson.overdraft).to.have.property('currency');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Available object has correct structure\", function () {\r",
+							"    pm.expect(responseJson.available).to.be.an('object');\r",
+							"    pm.expect(responseJson.available).to.have.property('value');\r",
+							"    pm.expect(responseJson.available).to.have.property('currency');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Balance fields have correct types\", function () {\r",
+							"    pm.expect(responseJson.balance.value).to.be.a('string');\r",
+							"    pm.expect(responseJson.balance.currency).to.be.a('string'); \r",
+							"});\r",
+							"\r",
+							"pm.test(\"Overdraft fields have correct types\", function () {\r",
+							"    pm.expect(responseJson.overdraft.value).to.be.a('string');\r",
+							"    pm.expect(responseJson.overdraft.currency).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Available fields have correct types\", function () {\r",
+							"    pm.expect(responseJson.available.value).to.be.a('string');\r",
+							"    pm.expect(responseJson.available.currency).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Values have correct numeric string format\", function () {\r",
+							"    const numericRegex = /^\\d+(\\.\\d{1,2})?$/;\r",
+							"    \r",
+							"    pm.expect(responseJson.balance.value, \"Balance value format\").to.match(numericRegex);\r",
+							"    pm.expect(responseJson.overdraft.value, \"Overdraft value format\").to.match(numericRegex);\r",
+							"    pm.expect(responseJson.available.value, \"Available value format\").to.match(numericRegex);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Balance is greater than zero\", function () {\r",
+							"    const balanceValue = parseFloat(responseJson.balance.value);\r",
+							"    pm.expect(balanceValue, \"Balance must be greater than 0\").to.be.greaterThan(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Overdraft is greater than zero\", function () {\r",
+							"    const overdraftValue = parseFloat(responseJson.overdraft.value);\r",
+							"    pm.expect(overdraftValue, \"Overdraft must be greater than 0\").to.be.greaterThan(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Available is greater than zero\", function () {\r",
+							"    const availableValue = parseFloat(responseJson.available.value);\r",
+							"    pm.expect(availableValue, \"Available must be greater than 0\").to.be.greaterThan(0);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/v1/agents/{{agent_id}}/points/{{point_id}}/balance",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"agents",
+						"{{agent_id}}",
+						"points",
+						"{{point_id}}",
+						"balance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create payment (1 RUB)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Generate paymentId for payment request\r",
+							"const payoutId = pm.globals.replaceIn('{{$randomUUID}}');\r",
+							"pm.collectionVariables.set('payout_id', payoutId);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Content-Type is application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"let responseJson;\r",
+							"try {\r",
+							"    responseJson = pm.response.json();\r",
+							"} catch (e) {\r",
+							"    pm.test(\"Failed to parse response as JSON\", function () {\r",
+							"        pm.expect.fail(\"Response is not valid JSON\");\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"pm.test(\"PaymentInfo has all required fields\", function () {\r",
+							"    pm.expect(responseJson).to.have.property('paymentId');\r",
+							"    pm.expect(responseJson).to.have.property('creationDateTime');\r",
+							"    pm.expect(responseJson).to.have.property('expirationDatetime');\r",
+							"    pm.expect(responseJson).to.have.property('status');\r",
+							"    pm.expect(responseJson).to.have.property('recipientDetails');\r",
+							"    pm.expect(responseJson).to.have.property('amount');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Basic fields have correct types\", function () {\r",
+							"    pm.expect(responseJson.paymentId).to.be.a('string');\r",
+							"    pm.expect(responseJson.paymentId).to.have.length.greaterThan(0);\r",
+							"    \r",
+							"    pm.expect(responseJson.creationDateTime).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$/);\r",
+							"    pm.expect(responseJson.expirationDatetime).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$/);\r",
+							"    \r",
+							"    pm.expect(responseJson.status).to.be.an('object');\r",
+							"    pm.expect(responseJson.recipientDetails).to.be.an('object');\r",
+							"    pm.expect(responseJson.amount).to.be.an('object');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"PaymentStatus has correct structure\", function () {\r",
+							"    const status = responseJson.status;\r",
+							"    \r",
+							"    pm.expect(status).to.have.property('value');\r",
+							"    pm.expect(status).to.have.property('changedDateTime');\r",
+							"    \r",
+							"    pm.expect(status.value).to.be.a('string');\r",
+							"    pm.expect(status.changedDateTime).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$/);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Payment status value is valid\", function () {\r",
+							"    pm.expect(responseJson.status.value).to.be.equal(\"CREATED\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"RecipientDetails has correct structure\", function () {\r",
+							"    const recipient = responseJson.recipientDetails;\r",
+							"    \r",
+							"    pm.expect(recipient).to.have.property('providerCode');\r",
+							"    pm.expect(recipient).to.have.property('fields');\r",
+							"    \r",
+							"    pm.expect(recipient.providerCode).to.be.a('string');\r",
+							"    pm.expect(recipient.fields).to.be.an('object');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Money object (amount) has correct structure\", function () {\r",
+							"    const amount = responseJson.amount;\r",
+							"    \r",
+							"    pm.expect(amount).to.have.property('value');\r",
+							"    pm.expect(amount).to.have.property('currency');\r",
+							"    \r",
+							"    pm.expect(amount.value).to.be.a('string');\r",
+							"    pm.expect(amount.currency).to.be.a('string');\r",
+							"    pm.expect(amount.currency).to.have.length(3);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Payment amount is greater than zero\", function () {\r",
+							"    const amountValue = parseFloat(responseJson.amount.value);\r",
+							"    pm.expect(amountValue).to.be.greaterThan(0);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-length": true
+				}
+			},
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"recipientDetails\": {\r\n    \"providerCode\": \"qiwi-wallet\",\r\n    \"fields\": {\r\n      \"phone\": \"79123456789\"\r\n    }\r\n  },\r\n  \"amount\": {\r\n    \"value\": \"1.00\",\r\n    \"currency\": \"RUB\"\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/v1/agents/{{agent_id}}/points/{{point_id}}/payments/{{payout_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"agents",
+						"{{agent_id}}",
+						"points",
+						"{{point_id}}",
+						"payments",
+						"{{payout_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Execute payment",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Content-Type is application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"let responseJson;\r",
+							"try {\r",
+							"    responseJson = pm.response.json();\r",
+							"} catch (e) {\r",
+							"    pm.test(\"Failed to parse response as JSON\", function () {\r",
+							"        pm.expect.fail(\"Response is not valid JSON\");\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"pm.test(\"PaymentInfo has all required fields\", function () {\r",
+							"    pm.expect(responseJson).to.have.property('paymentId');\r",
+							"    pm.expect(responseJson).to.have.property('creationDateTime');\r",
+							"    pm.expect(responseJson).to.have.property('expirationDatetime');\r",
+							"    pm.expect(responseJson).to.have.property('status');\r",
+							"    pm.expect(responseJson).to.have.property('recipientDetails');\r",
+							"    pm.expect(responseJson).to.have.property('amount');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Basic fields have correct types\", function () {\r",
+							"    pm.expect(responseJson.paymentId).to.be.a('string');\r",
+							"    pm.expect(responseJson.paymentId).to.have.length.greaterThan(0);\r",
+							"    \r",
+							"    pm.expect(responseJson.creationDateTime).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$/);\r",
+							"    pm.expect(responseJson.expirationDatetime).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$/);\r",
+							"    \r",
+							"    pm.expect(responseJson.status).to.be.an('object');\r",
+							"    pm.expect(responseJson.recipientDetails).to.be.an('object');\r",
+							"    pm.expect(responseJson.amount).to.be.an('object');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"PaymentStatus has correct structure\", function () {\r",
+							"    const status = responseJson.status;\r",
+							"    \r",
+							"    pm.expect(status).to.have.property('value');\r",
+							"    pm.expect(status).to.have.property('changedDateTime');\r",
+							"    \r",
+							"    pm.expect(status.value).to.be.a('string');\r",
+							"    pm.expect(status.changedDateTime).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$/);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Payment status value is valid\", function () {\r",
+							"    const validStatuses = ['IN_PROGRESS', 'COMPLETED'];\r",
+							"    pm.expect(validStatuses).to.include(responseJson.status.value);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"RecipientDetails has correct structure\", function () {\r",
+							"    const recipient = responseJson.recipientDetails;\r",
+							"    \r",
+							"    pm.expect(recipient).to.have.property('providerCode');\r",
+							"    pm.expect(recipient).to.have.property('fields');\r",
+							"    \r",
+							"    pm.expect(recipient.providerCode).to.be.a('string');\r",
+							"    pm.expect(recipient.fields).to.be.an('object');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Money object (amount) has correct structure\", function () {\r",
+							"    const amount = responseJson.amount;\r",
+							"    \r",
+							"    pm.expect(amount).to.have.property('value');\r",
+							"    pm.expect(amount).to.have.property('currency');\r",
+							"    \r",
+							"    pm.expect(amount.value).to.be.a('string');\r",
+							"    pm.expect(amount.currency).to.be.a('string');\r",
+							"    pm.expect(amount.currency).to.have.length(3);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Payment amount is greater than zero\", function () {\r",
+							"    const amountValue = parseFloat(responseJson.amount.value);\r",
+							"    pm.expect(amountValue).to.be.greaterThan(0);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/v1/agents/{{agent_id}}/points/{{point_id}}/payments/{{payout_id}}/execute",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"v1",
+						"agents",
+						"{{agent_id}}",
+						"points",
+						"{{point_id}}",
+						"payments",
+						"{{payout_id}}",
+						"execute"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{fake_bearer_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "\thttps://api-test.qiwi.com/partner",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "agent_id",
+			"value": "fake_agent_id",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "point_id",
+			"value": "fake_point_id",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "fake_bearer_token",
+			"value": "fake_bearer_token",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "payout_id",
+			"value": "",
+			"type": "string",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			}
+		}
+	]
+}
