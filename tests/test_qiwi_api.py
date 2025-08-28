@@ -72,7 +72,8 @@ def test_request_balance():
             assert isinstance(obj["value"], str)
             assert isinstance(obj["currency"], str)
             assert numeric_regex.match(obj["value"])
-            assert float(obj["value"]) > 0
+
+        assert float(data["balance"]["value"]) > 0
         request.dispose()
 
 

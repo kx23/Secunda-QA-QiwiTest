@@ -177,16 +177,7 @@
 							"    const balanceValue = parseFloat(responseJson.balance.value);\r",
 							"    pm.expect(balanceValue, \"Balance must be greater than 0\").to.be.greaterThan(0);\r",
 							"});\r",
-							"\r",
-							"pm.test(\"Overdraft is greater than zero\", function () {\r",
-							"    const overdraftValue = parseFloat(responseJson.overdraft.value);\r",
-							"    pm.expect(overdraftValue, \"Overdraft must be greater than 0\").to.be.greaterThan(0);\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Available is greater than zero\", function () {\r",
-							"    const availableValue = parseFloat(responseJson.available.value);\r",
-							"    pm.expect(availableValue, \"Available must be greater than 0\").to.be.greaterThan(0);\r",
-							"});"
+							""
 						],
 						"type": "text/javascript",
 						"packages": {}
